@@ -17,3 +17,5 @@ Book created: ID=1, Title=1984, Author=George Orwell, Year=1949
 ## Explanation
 The `create()` method is used to create and save a new Book instance in a single step. It returns the created object with its auto-generated primary key (ID). The book is immediately saved to the database.
 
+Book.objects.create
+

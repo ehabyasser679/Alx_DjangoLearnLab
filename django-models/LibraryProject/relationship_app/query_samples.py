@@ -23,7 +23,7 @@ def list_books_in_library(library_name: str) -> QuerySet:
 
 def get_librarian_for_library(library_name: str) -> Optional[Librarian]:
     try:
-        return Librarian.objects.get(library__name=library_name)
+        return Librarian.objects.get(library=library_name)
     except Librarian.DoesNotExist:
         return None
 

@@ -1,10 +1,14 @@
 from typing import Optional
 from django.db.models import QuerySet
+from relationship_app.models import Author
 
 from relationship_app.models import Book, Library, Librarian
 
 
 def query_books_by_author(author_name: str) -> QuerySet:
+    authorquery = Author.objects.get(name=author_name)
+    author=Author.objects.filter(author=Author)
+    
     return Book.objects.filter(author__name=author_name)
 
 

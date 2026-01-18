@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard</title>
+    <title>Librarian Dashboard</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -14,18 +14,18 @@
         }
         h1 {
             color: #333;
-            border-bottom: 3px solid #dc3545;
+            border-bottom: 3px solid #007bff;
             padding-bottom: 10px;
         }
-        .admin-header {
+        .librarian-header {
             background: white;
             padding: 20px;
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             margin-bottom: 30px;
         }
-        .admin-header h2 {
-            color: #dc3545;
+        .librarian-header h2 {
+            color: #007bff;
             margin-top: 0;
         }
         .stats-grid {
@@ -39,7 +39,7 @@
             padding: 20px;
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            border-left: 4px solid #dc3545;
+            border-left: 4px solid #007bff;
         }
         .stat-card h3 {
             margin-top: 0;
@@ -48,7 +48,7 @@
         .stat-number {
             font-size: 2em;
             font-weight: bold;
-            color: #dc3545;
+            color: #007bff;
         }
         .section {
             background: white;
@@ -58,7 +58,7 @@
             margin-bottom: 20px;
         }
         .section h2 {
-            color: #dc3545;
+            color: #007bff;
             margin-top: 0;
         }
         .item-list {
@@ -71,7 +71,7 @@
             background: #f9f9f9;
             padding: 15px;
             border-radius: 6px;
-            border-left: 3px solid #dc3545;
+            border-left: 3px solid #007bff;
         }
         .item-card h3 {
             margin-top: 0;
@@ -81,14 +81,14 @@
             display: inline-block;
             margin-top: 10px;
             padding: 5px 10px;
-            background-color: #dc3545;
+            background-color: #007bff;
             color: white;
             text-decoration: none;
             border-radius: 4px;
             font-size: 0.9em;
         }
         .item-card a:hover {
-            background-color: #c82333;
+            background-color: #0056b3;
         }
         .navigation {
             margin-bottom: 20px;
@@ -121,45 +121,38 @@
         <a href="{% url 'logout' %}" class="logout-link">Logout</a>
     </div>
 
-    <div class="admin-header">
-        <h1>Admin Dashboard</h1>
-        <h2>Welcome, {{ admin.user.username }}</h2>
-        <p><strong>Library:</strong> {{ admin.library.name }}</p>
+    <div class="librarian-header">
+        <h1>Librarian Dashboard</h1>
+        <h2>Welcome, {{ librarian.name }}</h2>
+        <p><strong>Library:</strong> {{ librarian.library.name }}</p>
     </div>
 
     <div class="stats-grid">
         <div class="stat-card">
-            <h3>Total Libraries</h3>
-            <div class="stat-number">{{ total_libraries }}</div>
+            <h3>Library Books</h3>
+            <div class="stat-number">{{ library_books_count }}</div>
         </div>
         <div class="stat-card">
-            <h3>Total Books</h3>
-            <div class="stat-number">{{ total_books }}</div>
+            <h3>Total Authors</h3>
+            <div class="stat-number">{{ authors_count }}</div>
         </div>
     </div>
 
     <div class="section">
-        <h2>All Libraries</h2>
-        {% if libraries %}
+        <h2>Books in Your Library</h2>
+        {% if library_book_instances %}
             <div class="item-list">
-                {% for library in libraries %}
+                {% for library_book in library_book_instances %}
                     <div class="item-card">
-                        <h3>{{ library.name }}</h3>
-                        <p><strong>Books:</strong> {{ library.books.count }}</p>
-                        <a href="{% url 'library-detail' library.pk %}">View Details</a>
+                        <h3>{{ library_book.book.title }}</h3>
+                        <p><strong>Author:</strong> {{ library_book.book.author.name }}</p>
+                        <p><strong>Added:</strong> {{ library_book.date_added|date:"M d, Y" }}</p>
                     </div>
                 {% endfor %}
             </div>
-        {% else %}
-            <p>No libraries available.</p>
-        {% endif %}
-    </div>
-
-    <div class="section">
-        <h2>All Books</h2>
-        {% if books %}
+        {% elif library_books %}
             <div class="item-list">
-                {% for book in books %}
+                {% for book in library_books %}
                     <div class="item-card">
                         <h3>{{ book.title }}</h3>
                         <p><strong>Author:</strong> {{ book.author.name }}</p>
@@ -167,8 +160,14 @@
                 {% endfor %}
             </div>
         {% else %}
-            <p>No books available.</p>
+            <p>No books available in your library.</p>
         {% endif %}
+    </div>
+
+    <div class="section">
+        <h2>Library Information</h2>
+        <p><strong>Library Name:</strong> {{ librarian.library.name }}</p>
+        <p><strong>Total Books:</strong> {{ library_books_count }}</p>
     </div>
 </body>
 </html>

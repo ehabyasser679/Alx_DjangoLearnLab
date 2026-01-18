@@ -1,31 +1,32 @@
-from django.db import models
+from typing import Optional
+from django.db.models import QuerySet
+from relationship_app.models import Author
 
-# Create your models here.
+from relationship_app.models import Book, Library, Librarian
 
-class Author(models.Model):
-    name = models.CharField(max_length=100)
-    def __str__(self):
-        return self.name
 
-class Book(models.Model):
-    title = models.CharField(max_length=100)
-    author = models.ForeignKey(Author, on_delete=models.CASCADE)
-    def __str__(self):
-        return self.title
+def query_books_by_author(author_name: str) -> QuerySet:
+    authorquery = Author.objects.get(name=author_name)
+    author=Author.objects.filter(author=Author)
+    
+    return Book.objects.filter(author__name=author_name)
 
-class LibraryBook(models.Model):
-    library = models.ForeignKey('Library', on_delete=models.CASCADE)
-    book = models.ForeignKey(Book, on_delete=models.CASCADE)
-    date_added = models.DateField(auto_now_add=True)
 
-class Library(models.Model):
-    name = models.CharField(max_length=100)
-    books = models.ManyToManyField(Book, through='LibraryBook')
-    def __str__(self):
-        return self.name
+def list_books_in_library(library_name: str) -> QuerySet:
+    try:
+        library = Library.objects.get(name=library_name)
+    except Library.DoesNotExist:
+        return Book.objects.none()
+    return library.books.all()
 
-class Librarian(models.Model):
-    name = models.CharField(max_length=100)
-    library = models.OneToOneField(Library, on_delete=models.CASCADE)
-    def __str__(self):
-        return self.name
+
+def get_librarian_for_library(library_name: str) -> Optional[Librarian]:
+    try:
+        return Librarian.objects.get(library__name=library_name)
+    except Librarian.DoesNotExist:
+        return None
+
+
+
+
+

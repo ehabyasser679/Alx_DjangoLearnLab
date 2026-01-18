@@ -13,6 +13,13 @@ class Book(models.Model):
     author = models.ForeignKey(Author, on_delete=models.CASCADE)
     def __str__(self):
         return self.title
+    
+    class Meta:
+        permissions = [
+            ("can_add_book", "Can add book"),
+            ("can_change_book", "Can change book"),
+            ("can_delete_book", "Can delete book"),
+        ]
 
 class LibraryBook(models.Model):
     library = models.ForeignKey('Library', on_delete=models.CASCADE)

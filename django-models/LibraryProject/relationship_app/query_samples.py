@@ -6,10 +6,11 @@ from relationship_app.models import Book, Library, Librarian
 
 
 def query_books_by_author(author_name: str) -> QuerySet:
-    authorquery = Author.objects.get(name=author_name)
-    author=Author.objects.filter(author=Author)
-    
-    return Book.objects.filter(author__name=author_name)
+    try:
+        author = Author.objects.get(name=author_name)
+    except Author.DoesNotExist:
+        return Book.objects.none()
+    return Book.objects.filter(author=author)
 
 
 def list_books_in_library(library_name: str) -> QuerySet:

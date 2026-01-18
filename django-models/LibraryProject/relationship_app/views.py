@@ -5,6 +5,7 @@ from django.contrib.auth import login
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required, user_passes_test, permission_required
 from django.http import HttpResponseForbidden
+from django.contrib.auth.decorators import permission_required
 from django.forms import ModelForm
 from functools import wraps
 
@@ -197,4 +198,5 @@ def delete_book(request, pk):
         book.delete()
         return redirect('book-list')
     return render(request, 'relationship_app/book_confirm_delete.html', {'book': book})
+
 

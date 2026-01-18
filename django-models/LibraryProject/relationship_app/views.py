@@ -3,7 +3,7 @@ from django.views.generic import TemplateView, ListView, DetailView
 from .models import Library, Book, Admin, Librarian, Member, Author, LibraryBook
 from django.contrib.auth import login
 from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.http import HttpResponseForbidden
 from functools import wraps
 
@@ -31,6 +31,25 @@ def all_books_view(request):
     books = Book.objects.all()
     return render(request, "relationship_app/book_list.html", {"books": books})
 
+# Test functions for user_passes_test decorator
+def is_admin(user):
+    """Check if user has Admin role"""
+    if not user.is_authenticated:
+        return False
+    return Admin.objects.filter(user=user).exists()
+
+def is_librarian(user):
+    """Check if user has Librarian role"""
+    if not user.is_authenticated:
+        return False
+    return Librarian.objects.filter(name=user.username).exists()
+
+def is_member(user):
+    """Check if user has Member role"""
+    if not user.is_authenticated:
+        return False
+    return Member.objects.filter(user=user).exists()
+
 def admin_required(view_func):
     """Decorator to check if user has Admin role"""
     @wraps(view_func)
@@ -45,7 +64,7 @@ def admin_required(view_func):
     return _wrapped_view
 
 @login_required
-@admin_required
+@user_passes_test(is_admin)
 def admin_view(request):
     """Admin view that only users with Admin role can access"""
     try:
@@ -78,7 +97,7 @@ def librarian_required(view_func):
     return _wrapped_view
 
 @login_required
-@librarian_required
+@user_passes_test(is_librarian)
 def librarian_view(request):
     """Librarian view that only users with Librarian role can access"""
     try:
@@ -117,7 +136,7 @@ def member_required(view_func):
     return _wrapped_view
 
 @login_required
-@member_required
+@user_passes_test(is_member)
 def member_view(request):
     """Member view that only users with Member role can access"""
     try:

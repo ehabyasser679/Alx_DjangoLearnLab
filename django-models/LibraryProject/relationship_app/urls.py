@@ -4,6 +4,7 @@ URL configuration for relationship_app.
 from django.urls import path
 from django.contrib.auth.views import LoginView, LogoutView
 from relationship_app import views
+from .views import list_books, LibraryDetailView
 
 urlpatterns = [
     path('libraries/', views.LibrarylistView.as_view(), name='library-list'),
@@ -19,3 +20,4 @@ urlpatterns = [
     path('librarian/', views.librarian_view, name='librarian-view'),
     path('member/', views.member_view, name='member-view'),
 ]
+

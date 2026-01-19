@@ -5,7 +5,6 @@ from django.contrib.auth import login
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required, user_passes_test, permission_required
 from django.http import HttpResponseForbidden
-from django.contrib.auth.decorators import permission_required
 from django.forms import ModelForm
 from functools import wraps
 
@@ -31,7 +30,7 @@ def register(request):
 
 def all_books_view(request):
     books = Book.objects.all()
-    return render(request, "relationship_app/book_list.html", {"books": books})
+    return render(request, "relationship_app/list_books.html", {"books": books})
 
 # Test functions for user_passes_test decorator
 def is_admin(user):
@@ -198,5 +197,4 @@ def delete_book(request, pk):
         book.delete()
         return redirect('book-list')
     return render(request, 'relationship_app/book_confirm_delete.html', {'book': book})
-
 

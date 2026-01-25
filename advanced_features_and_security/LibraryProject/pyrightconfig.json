@@ -1,0 +1,25 @@
+{
+  "include": [
+    "."
+  ],
+  "exclude": [
+    "**/__pycache__",
+    "**/node_modules",
+    "**/.*"
+  ],
+  "executionEnvironments": [
+    {
+      "root": ".",
+      "pythonVersion": "3",
+      "pythonPlatform": "All",
+      "extraPaths": [
+        "."
+      ]
+    }
+  ],
+  "reportMissingImports": "warning",
+  "reportMissingTypeStubs": false,
+  "typeCheckingMode": "basic",
+  "pythonVersion": "3"
+}
+

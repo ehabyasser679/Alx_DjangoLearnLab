@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book List</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #333;
+            border-bottom: 3px solid #007bff;
+            padding-bottom: 10px;
+        }
+        .header-actions {
+            margin-bottom: 20px;
+        }
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            text-decoration: none;
+            display: inline-block;
+            transition: background-color 0.3s;
+            margin-right: 10px;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            color: white;
+        }
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+        table {
+            width: 100%;
+            background: white;
+            border-collapse: collapse;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #007bff;
+            color: white;
+            font-weight: bold;
+        }
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+        .actions {
+            display: flex;
+            gap: 10px;
+        }
+        .btn-sm {
+            padding: 5px 10px;
+            font-size: 14px;
+        }
+        .btn-info {
+            background-color: #17a2b8;
+            color: white;
+        }
+        .btn-info:hover {
+            background-color: #138496;
+        }
+        .btn-warning {
+            background-color: #ffc107;
+            color: #333;
+        }
+        .btn-warning:hover {
+            background-color: #e0a800;
+        }
+        .btn-danger {
+            background-color: #dc3545;
+            color: white;
+        }
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+        .empty-message {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <h1>Book List</h1>
+    
+    <div class="header-actions">
+        <!-- Security: Search form uses GET method (safe for read operations) -->
+        <!-- All user input is automatically escaped by Django templates -->
+        <form method="get" action="{% url 'bookshelf-index' %}" style="display: inline-block; margin-right: 10px;">
+            <input type="text" name="search" placeholder="Search books..." 
+                   value="{{ search_query|escape }}" 
+                   maxlength="100" 
+                   style="padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+            <button type="submit" class="btn btn-primary" style="margin-left: 5px;">Search</button>
+            {% if search_query %}
+                <a href="{% url 'bookshelf-index' %}" class="btn btn-secondary" style="margin-left: 5px;">Clear</a>
+            {% endif %}
+        </form>
+        <a href="{% url 'bookshelf-create' %}" class="btn btn-primary">Add New Book</a>
+    </div>
+
+    {% if books %}
+    <table>
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Author</th>
+                <th>Publication Year</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for book in books %}
+            <tr>
+                <td>{{ book.title }}</td>
+                <td>{{ book.author }}</td>
+                <td>{{ book.publication_year }}</td>
+                <td>
+                    <div class="actions">
+                        <a href="{% url 'bookshelf-detail' book.pk %}" class="btn btn-info btn-sm">View</a>
+                        <a href="{% url 'bookshelf-edit' book.pk %}" class="btn btn-warning btn-sm">Edit</a>
+                        <a href="{% url 'bookshelf-delete' book.pk %}" class="btn btn-danger btn-sm">Delete</a>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div class="empty-message">
+        <p>No books available. <a href="{% url 'bookshelf-create' %}">Create the first book</a></p>
+    </div>
+    {% endif %}
+</body>
+</html>
+

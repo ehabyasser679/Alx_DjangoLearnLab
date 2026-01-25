@@ -3,13 +3,11 @@ from django.http import HttpResponse, JsonResponse
 from django.contrib.auth.models import Permission
 from django.contrib.auth.decorators import login_required, permission_required
 from django.db import migrations
-from django import forms
-from django.forms import ModelForm
 from django.db.models import Q
 from django.core.exceptions import ValidationError
 from django.utils.html import escape
-import re
 from .models import book
+from .forms import BookForm,ExampleForm
 
 @permission_required('app_name.can_edit', raise_exception=True)
 
@@ -43,48 +41,6 @@ class Migration(migrations.Migration):
     operations = [
         migrations.RunPython(create_groups),
     ]
-
-
-# Form for book model with input validation
-# Security: Using ModelForm ensures automatic validation and prevents SQL injection
-# Django ORM automatically parameterizes queries, preventing SQL injection attacks
-class BookForm(ModelForm):
-    class Meta:
-        model = book
-        fields = ['title', 'author', 'publication_year']
-    
-    def clean_title(self):
-        """Validate and sanitize title input"""
-        title = self.cleaned_data.get('title')
-        if title:
-            # Strip whitespace and limit length
-            title = title.strip()[:200]  # Max length matches model field
-            if not title:
-                raise forms.ValidationError("Title cannot be empty.")
-        return title
-    
-    def clean_author(self):
-        """Validate and sanitize author input"""
-        author = self.cleaned_data.get('author')
-        if author:
-            # Strip whitespace and limit length
-            author = author.strip()[:100]  # Max length matches model field
-            if not author:
-                raise forms.ValidationError("Author cannot be empty.")
-        return author
-    
-    def clean_publication_year(self):
-        """Validate publication year to prevent invalid dates"""
-        year = self.cleaned_data.get('publication_year')
-        if year:
-            # Ensure year is reasonable (between 1000 and current year + 1)
-            from datetime import datetime
-            current_year = datetime.now().year
-            if year < 1000 or year > current_year + 1:
-                raise forms.ValidationError(
-                    f"Publication year must be between 1000 and {current_year + 1}."
-                )
-        return year
 
 
 @login_required

@@ -76,6 +76,16 @@ SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 # Note: Requires manual submission to https://hstspreload.org/
 SECURE_HSTS_PRELOAD = True
 
+# Proxy SSL Header: Trust the X-Forwarded-Proto header from reverse proxy
+# Security: When Django is behind a reverse proxy (Nginx, Apache, etc.) that
+#          terminates SSL/TLS, this setting tells Django to trust the proxy's
+#          X-Forwarded-Proto header to determine if the original request was HTTPS
+# Format: (header_name, expected_value)
+# WARNING: Only enable if you trust your reverse proxy, otherwise this can be
+#          exploited to bypass HTTPS security checks
+# IMPORTANT: Ensure your reverse proxy is properly configured to set this header
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
 # ============================================================================
 # Cookie Security Configuration
 # ============================================================================

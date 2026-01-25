@@ -8,6 +8,7 @@ from django.contrib.auth.decorators import login_required, user_passes_test, per
 from django.http import HttpResponseForbidden
 from django.forms import ModelForm
 from functools import wraps
+from django.contrib.auth.decorators import permission_required
 
 # Create your views here.
 class LibrarylistView(ListView, TemplateView):
@@ -198,5 +199,6 @@ def delete_book(request, pk):
         book.delete()
         return redirect('book-list')
     return render(request, 'relationship_app/book_confirm_delete.html', {'book': book})
+
 
 

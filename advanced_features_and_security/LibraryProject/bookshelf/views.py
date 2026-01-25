@@ -7,7 +7,8 @@ from django.db.models import Q
 from django.core.exceptions import ValidationError
 from django.utils.html import escape
 from .models import book
-from .forms import BookForm,ExampleForm
+from .forms import BookForm
+from .forms import ExampleForm
 
 @permission_required('app_name.can_edit', raise_exception=True)
 
@@ -201,3 +202,4 @@ def book_detail(request, pk):
     # Security: Django templates automatically escape all variables
     # Additional |escape filter in templates provides defense in depth
     return render(request, 'bookshelf/book_detail.html', {'book': book_instance})
+

@@ -13,7 +13,6 @@ class BookAdmin(admin.ModelAdmin):
     ordering = ('title',)
 
 
-@admin.register(CustomUser)
 class CustomUserAdmin(UserAdmin):
     list_display = ('username', 'email', 'first_name', 'last_name', 'is_staff')
     search_fields = ('username', 'email', 'first_name', 'last_name')
@@ -26,4 +25,6 @@ class CustomUserAdmin(UserAdmin):
     add_fieldsets = UserAdmin.add_fieldsets + (
         ('Additional Fields', {'fields': ('phone_number', 'bio', 'date_of_birth', 'profile_photo')}),
     )
+
+admin.site.register(CustomUser, CustomUserAdmin)
 

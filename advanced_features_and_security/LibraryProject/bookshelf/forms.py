@@ -76,3 +76,56 @@ class BookForm(ModelForm):
                 )
         return year
 
+
+class ExampleForm(forms.Form):
+    """
+    Example form demonstrating Django form usage.
+    
+    This is a simple form example that shows how to create forms
+    with various field types and validation.
+    """
+    
+    name = forms.CharField(
+        max_length=100,
+        required=True,
+        help_text="Enter your name",
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Your name'})
+    )
+    
+    email = forms.EmailField(
+        required=True,
+        help_text="Enter your email address",
+        widget=forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'your@email.com'})
+    )
+    
+    message = forms.CharField(
+        required=True,
+        widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 5, 'placeholder': 'Your message'}),
+        help_text="Enter your message"
+    )
+    
+    age = forms.IntegerField(
+        required=False,
+        min_value=0,
+        max_value=150,
+        help_text="Enter your age (optional)"
+    )
+    
+    def clean_name(self):
+        """Validate and sanitize name input"""
+        name = self.cleaned_data.get('name')
+        if name:
+            name = name.strip()
+            if len(name) < 2:
+                raise forms.ValidationError("Name must be at least 2 characters long.")
+        return name
+    
+    def clean_message(self):
+        """Validate message input"""
+        message = self.cleaned_data.get('message')
+        if message:
+            message = message.strip()
+            if len(message) < 10:
+                raise forms.ValidationError("Message must be at least 10 characters long.")
+        return message
+

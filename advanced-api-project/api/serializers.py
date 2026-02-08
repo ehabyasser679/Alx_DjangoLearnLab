@@ -6,6 +6,17 @@ from .models import Author, Book
 
 
 # ------------------------------------------------------------------------------
+# BookListSerializer
+# ------------------------------------------------------------------------------
+# Minimal serializer for embedding books inside Author (avoids circular nesting).
+# ------------------------------------------------------------------------------
+class BookListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Book
+        fields = ['id', 'title', 'publication_year']
+
+
+# ------------------------------------------------------------------------------
 # AuthorSerializer
 # ------------------------------------------------------------------------------
 # Purpose: Serializes/deserializes Author model instances for API requests and
@@ -14,10 +25,11 @@ from .models import Author, Book
 # ------------------------------------------------------------------------------
 class AuthorSerializer(serializers.ModelSerializer):
     name = serializers.CharField(max_length=100)
+    Books = BookListSerializer(many=True, read_only=True)
 
     class Meta:
         model = Author
-        fields = ['name']
+        fields = ['name', 'Books']
 
 
 # ------------------------------------------------------------------------------
@@ -36,7 +48,7 @@ class AuthorSerializer(serializers.ModelSerializer):
 # ------------------------------------------------------------------------------
 class BookSerializer(serializers.ModelSerializer):
     title = serializers.CharField(max_length=100)
-    publication_year = serializers.DateField()
+    publication_year = serializers.DateField() 
     author = AuthorSerializer()
 
     def validate_publication_year(self, value):

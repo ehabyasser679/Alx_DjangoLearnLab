@@ -5,13 +5,17 @@ These views provide CRUD operations for Book instances. Permissions are configur
 so that read operations (list, detail) are public, while write operations
 (create, update, delete) require authentication.
 
-Custom hooks:
-- perform_create/perform_update: Override points for logging or side effects.
-- get_queryset: Supports filtering by title and publication_year via query params.
+Filtering, Search, and Ordering (ListView):
+- DjangoFilterBackend: Filter by title, author, author__name, publication_year
+- SearchFilter: Text search across title and author name (?search=...)
+- OrderingFilter: Sort by title, publication_year, author (?ordering=...)
 """
 from rest_framework import generics
-from rest_framework.permissions import AllowAny
-from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
+from rest_framework.filters import OrderingFilter, SearchFilter
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from django_filters.rest_framework import DjangoFilterBackend
+
+from .filters import BookFilter
 from .models import Book
 from .serializers import BookSerializer
 
@@ -23,22 +27,36 @@ from .serializers import BookSerializer
 class ListView(generics.ListAPIView):
     """
     GET /books/
-    List all books. Supports optional filtering via query parameters:
-    - ?title=<partial> - Filter by title (case-insensitive contains)
-    - ?publication_year=<YYYY-MM-DD> - Filter by exact publication date
+    List all books with filtering, search, and ordering.
+
+    Filtering (DjangoFilterBackend):
+    - ?title=<partial> - Title contains (case-insensitive)
+    - ?author=<id> - Author ID (exact)
+    - ?author__name=<partial> - Author name contains (case-insensitive)
+    - ?publication_year=<YYYY-MM-DD> - Exact publication date
+    - ?publication_year_after=<YYYY-MM-DD> - Published on or after
+    - ?publication_year_before=<YYYY-MM-DD> - Published on or before
+
+    Search (SearchFilter):
+    - ?search=<query> - Searches title and author name
+
+    Ordering (OrderingFilter):
+    - ?ordering=title - Sort by title (asc)
+    - ?ordering=-title - Sort by title (desc)
+    - ?ordering=publication_year - Sort by date (asc)
+    - ?ordering=-publication_year - Sort by date (desc)
+    - ?ordering=author - Sort by author name (asc)
+    - ?ordering=-author - Sort by author name (desc)
     """
     serializer_class = BookSerializer
     permission_classes = [AllowAny]
+    queryset = Book.objects.all().select_related('author')
 
-    def get_queryset(self):
-        queryset = Book.objects.all().select_related('author')
-        title = self.request.query_params.get('title', None)
-        publication_year = self.request.query_params.get('publication_year', None)
-        if title:
-            queryset = queryset.filter(title__icontains=title)
-        if publication_year:
-            queryset = queryset.filter(publication_year=publication_year)
-        return queryset
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    filterset_class = BookFilter
+    search_fields = ['title', 'author__name']
+    ordering_fields = ['title', 'publication_year', 'author__name']
+    ordering = ['title']  # Default ordering
 
 
 class DetailView(generics.RetrieveAPIView):
@@ -94,4 +112,3 @@ class DeleteView(generics.DestroyAPIView):
     queryset = Book.objects.all()
     serializer_class = BookSerializer
     permission_classes = [IsAuthenticated]
-

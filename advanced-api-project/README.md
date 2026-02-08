@@ -178,6 +178,45 @@ curl -X POST http://127.0.0.1:8000/books/create/ ^
 2. **Auth**: For write endpoints, set Auth type to "Basic Auth" and enter credentials.
 3. **Body**: For POST/PATCH, use raw JSON with `Content-Type: application/json`.
 
+## Testing
+
+### Test Suite
+
+Unit tests are in `api/test_views.py` and cover:
+
+| Category | Test Cases |
+|----------|------------|
+| **CRUD** | List (200, data structure), Detail (200, 404), Create (201, validation), Update (200, validation), Delete (204) |
+| **Filtering** | title, author, author__name, publication_year, publication_year_after |
+| **Search** | search across title and author name |
+| **Ordering** | ordering by title, publication_year (asc/desc) |
+| **Permissions** | List/Detail allowed without auth; Create/Update/Delete require auth (403 when unauthenticated) |
+
+### Run Tests
+
+```bash
+# Run all API view tests
+python manage.py test api.test_views
+
+# Run with verbose output
+python manage.py test api.test_views -v 2
+
+# Run all tests in the api app
+python manage.py test api
+```
+
+### Test Environment
+
+- Django uses a separate in-memory SQLite database for tests (no impact on development/production data).
+- Each test runs in a transaction that is rolled back after the test.
+- `APITestCase` provides `self.client` for making API requests.
+
+### Interpreting Results
+
+- `OK` — All tests passed.
+- `FAIL` — A test assertion failed; check the traceback for the failing test and assertion.
+- `ERROR` — A test raised an exception before assertions; check the traceback for the cause.
+
 ## Run server
 
 ```bash

@@ -11,10 +11,9 @@ Filtering, Search, and Ordering (ListView):
 - OrderingFilter: Sort by title, publication_year, author (?ordering=...)
 """
 from rest_framework import generics
-from rest_framework.filters import OrderingFilter, SearchFilter
+from rest_framework import filters
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from django_filters.rest_framework import DjangoFilterBackend
-from django_filters import rest_framework
 
 from .filters import BookFilter
 from .models import Book
@@ -53,7 +52,7 @@ class ListView(generics.ListAPIView):
     permission_classes = [AllowAny]
     queryset = Book.objects.all().select_related('author')
 
-    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_class = BookFilter
     search_fields = ['title', 'author__name']
     ordering_fields = ['title', 'publication_year', 'author__name']
@@ -113,4 +112,3 @@ class DeleteView(generics.DestroyAPIView):
     queryset = Book.objects.all()
     serializer_class = BookSerializer
     permission_classes = [IsAuthenticated]
-

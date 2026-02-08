@@ -36,20 +36,25 @@ class AuthorSerializer(serializers.ModelSerializer):
 # BookSerializer
 # ------------------------------------------------------------------------------
 # Purpose: Serializes/deserializes Book model instances. Handles the Author-Book
-# relationship via nested serialization (see "Relationship handling" below).
+# relationship: nested author on READ, author ID on WRITE for form submissions.
 #
 # Relationship handling (Author <-> Book):
-# - Uses AuthorSerializer() as a nested serializer for the 'author' field.
-# - On READ (GET): Returns the full author object embedded in each book, e.g.:
-#     {"title": "Example", "publication_year": "2020-01-01", "author": {"name": "Jane Doe"}}
-# - On WRITE (POST/PUT): Nested writes require custom create()/update() logic.
-#   For simple author assignment by ID, use PrimaryKeyRelatedField instead.
-# - AuthorSerializer is defined before BookSerializer because it is referenced here.
+# - READ: Returns full author object via to_representation().
+# - WRITE: Accepts author by ID (PrimaryKeyRelatedField) for create/update.
 # ------------------------------------------------------------------------------
 class BookSerializer(serializers.ModelSerializer):
     title = serializers.CharField(max_length=100)
-    publication_year = serializers.DateField() 
-    author = AuthorSerializer()
+    publication_year = serializers.DateField()
+    author = serializers.PrimaryKeyRelatedField(
+        queryset=Author.objects.all(),
+        write_only=False,
+    )
+
+    def to_representation(self, instance):
+        """Return nested author object on read for richer API responses."""
+        rep = super().to_representation(instance)
+        rep['author'] = AuthorSerializer(instance.author).data
+        return rep
 
     def validate_publication_year(self, value):
         """Ensure publication_year is not in the future."""
@@ -61,4 +66,4 @@ class BookSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Book
-        fields = ['title', 'publication_year', 'author']
+        fields = ['id', 'title', 'publication_year', 'author']

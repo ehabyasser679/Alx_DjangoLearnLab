@@ -124,7 +124,7 @@ class BookCreateTests(BookAPITestCase):
 
     def test_create_with_auth_returns_201(self):
         """Create with auth returns 201 and saves book."""
-        self.client.force_authenticate(user=self.user)
+        self.client.login(username='testuser', password='testpass123')
         url = reverse('api:book-create')
         data = {
             'title': 'New Book',
@@ -138,7 +138,7 @@ class BookCreateTests(BookAPITestCase):
 
     def test_create_validates_future_publication_year(self):
         """Create rejects publication_year in the future."""
-        self.client.force_authenticate(user=self.user)
+        self.client.login(username='testuser', password='testpass123')
         url = reverse('api:book-create')
         data = {
             'title': 'Future Book',
@@ -162,7 +162,7 @@ class BookUpdateTests(BookAPITestCase):
 
     def test_update_with_auth_returns_200(self):
         """Update with auth returns 200 and saves changes."""
-        self.client.force_authenticate(user=self.user)
+        self.client.login(username='testuser', password='testpass123')
         url = reverse('api:book-update', kwargs={'pk': self.book1.pk})
         data = {'title': 'Updated Title'}
         response = self.client.patch(url, data, format='json')
@@ -172,7 +172,7 @@ class BookUpdateTests(BookAPITestCase):
 
     def test_update_rejects_future_publication_year(self):
         """Update rejects publication_year in the future."""
-        self.client.force_authenticate(user=self.user)
+        self.client.login(username='testuser', password='testpass123')
         url = reverse('api:book-update', kwargs={'pk': self.book1.pk})
         data = {'publication_year': '2030-01-01'}
         response = self.client.patch(url, data, format='json')
@@ -191,7 +191,7 @@ class BookDeleteTests(BookAPITestCase):
 
     def test_delete_with_auth_removes_book(self):
         """Delete with auth returns 204 and removes book."""
-        self.client.force_authenticate(user=self.user)
+        self.client.login(username='testuser', password='testpass123')
         url = reverse('api:book-delete', kwargs={'pk': self.book1.pk})
         response = self.client.delete(url)
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
@@ -310,7 +310,7 @@ class BookPermissionTests(BookAPITestCase):
 
     def test_list_allowed_without_auth(self):
         """List and detail are accessible without authentication."""
-        self.client.force_authenticate(user=None)
+        self.client.logout()
         list_resp = self.client.get(reverse('api:book-list'))
         detail_resp = self.client.get(
             reverse('api:book-detail', kwargs={'pk': self.book1.pk})
@@ -320,7 +320,7 @@ class BookPermissionTests(BookAPITestCase):
 
     def test_create_update_delete_require_auth(self):
         """Create, update, delete require authentication."""
-        self.client.force_authenticate(user=None)
+        self.client.logout()
         create_resp = self.client.post(
             reverse('api:book-create'),
             {'title': 'X', 'publication_year': '2020-01-01', 'author': self.author1.pk},

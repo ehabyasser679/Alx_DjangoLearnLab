@@ -10,8 +10,8 @@ Custom hooks:
 - get_queryset: Supports filtering by title and publication_year via query params.
 """
 from rest_framework import generics
-from rest_framework.permissions import AllowAny, IsAuthenticated
-
+from rest_framework.permissions import AllowAny
+from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
 from .models import Book
 from .serializers import BookSerializer
 
@@ -94,3 +94,4 @@ class DeleteView(generics.DestroyAPIView):
     queryset = Book.objects.all()
     serializer_class = BookSerializer
     permission_classes = [IsAuthenticated]
+

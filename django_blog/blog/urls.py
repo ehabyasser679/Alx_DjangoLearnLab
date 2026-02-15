@@ -9,9 +9,10 @@ urlpatterns = [
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
     path('register/', views.register, name='register'),
     path("profile/", views.profile, name= "profile"),
-    path("posts/", BlogListView.as_view(), name= "posts"),
-    path("posts/<int:pk>/", BlogDetailView.as_view(), name= "post_detail"),
-    path("posts/new/", BlogCreateView.as_view(), name= "post_new"),
-    path("posts/<int:pk>/edit/", BlogUpdateView.as_view(), name= "post_edit"),
-    path("posts/<int:pk>/delete/", BlogDeleteView.as_view(), name= "post_delete"),
+    path("post/", BlogListView.as_view(), name= "posts"),
+    path("post/<int:pk>/", BlogDetailView.as_view(), name= "post_detail"),
+    path("post/new/", BlogCreateView.as_view(), name= "post_new"),
+    path("post/<int:pk>/edit/", BlogUpdateView.as_view(), name= "post_edit"),
+    path("post/<int:pk>/delete/", BlogDeleteView.as_view(), name= "post_delete"),
 ]
+

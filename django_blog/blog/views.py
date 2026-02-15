@@ -25,7 +25,7 @@ def profile(request):
 class BlogListView(ListView):
     model = Post
     template_name = "blog/post_list.html"
-    context_object_name = "posts"
+    context_object_name = "post"
     ordering = ['-published_date']
 
 class BlogDetailView(DetailView):
@@ -36,7 +36,7 @@ class BlogCreateView(LoginRequiredMixin,CreateView):
     model = Post
     template_name = "blog/post_form.html"
     fields = ["title", "content"]
-    success_url = reverse_lazy("posts")
+    success_url = reverse_lazy("post")
 
     def form_valid(self, form):
         form.instance.author = self.request.user
@@ -46,7 +46,7 @@ class BlogUpdateView(LoginRequiredMixin,UpdateView):
     model = Post
     template_name = "blog/post_form.html"
     fields = ["title", "content"]
-    success_url = reverse_lazy("posts")
+    success_url = reverse_lazy("post")
     def form_valid(self, form):
         form.instance.author = self.request.user
         return super().form_valid(form)
@@ -54,4 +54,4 @@ class BlogUpdateView(LoginRequiredMixin,UpdateView):
 class BlogDeleteView(LoginRequiredMixin,DeleteView):
     model = Post
     template_name = "blog/post_confirm_delete.html"
-    success_url = reverse_lazy("posts")
+    success_url = reverse_lazy("post")

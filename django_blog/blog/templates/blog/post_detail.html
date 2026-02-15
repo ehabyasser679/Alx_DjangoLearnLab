@@ -11,5 +11,22 @@
     {% endif %}
     <br>
     <a href="{% url 'post' %}">Back to List</a>
+    <hr>
+    <h3>Comments</h3>
+    {% for comment in post.comments.all %}
+    <div class="comment">
+        <p><strong>{{ comment.author }}</strong> said:</p>
+        <p>{{ comment.content }}</p>
+        <small>{{ comment.created_at }}</small>
+        {% if user == comment.author %}
+        <a href="{% url 'comment_edit' comment.pk %}">Edit</a>
+        <a href="{% url 'comment_delete' comment.pk %}">Delete</a>
+        {% endif %}
+    </div>
+    <hr>
+    {% empty %}
+    <p>No comments yet.</p>
+    {% endfor %}
+    <a href="{% url 'add_comment' post.pk %}">Add Comment</a>
 </article>
 {% endblock %}

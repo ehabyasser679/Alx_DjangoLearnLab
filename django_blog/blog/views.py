@@ -6,6 +6,7 @@ from django.urls import reverse_lazy
 from .forms import CustomUserCreationForm, CommentForm
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from .models import Post, Comment
+from django.db.models import Q
 
 def register(request):
     if request.method == "POST":
@@ -22,6 +23,26 @@ def register(request):
 def profile(request):
     return render(request, 'blog/profile.html')
 
+def search(request):
+    query = request.GET.get('q')
+    results = []
+    if query:
+        results = Post.objects.filter(
+            Q(title__icontains=query) | 
+            Q(content__icontains=query) |
+            Q(tags__name__icontains=query)
+        ).distinct()
+    return render(request, 'blog/search_results.html', {'query': query, 'results': results})
+
+class PostByTagListView(ListView):
+    model = Post
+    template_name = 'blog/post_list.html'
+    context_object_name = 'post'
+    ordering = ['-published_date']
+
+    def get_queryset(self):
+        return Post.objects.filter(tags__slug=self.kwargs.get('tag_slug'))
+
 class BlogListView(ListView):
     model = Post
     template_name = "blog/post_list.html"
@@ -35,7 +56,7 @@ class BlogDetailView(DetailView):
 class BlogCreateView(LoginRequiredMixin,CreateView):
     model = Post
     template_name = "blog/post_form.html"
-    fields = ["title", "content"]
+    fields = ["title", "content", "tags"]
     success_url = reverse_lazy("post")
 
     def form_valid(self, form):
@@ -45,7 +66,7 @@ class BlogCreateView(LoginRequiredMixin,CreateView):
 class BlogUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Post
     template_name = "blog/post_form.html"
-    fields = ["title", "content"]
+    fields = ["title", "content", "tags"]
     success_url = reverse_lazy("post")
     
     def form_valid(self, form):

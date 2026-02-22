@@ -3,9 +3,12 @@ from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import status
+from rest_framework import status, generics, permissions
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated
+from django.contrib.auth import get_user_model
+
+CustomUser = get_user_model()
 
 from .serializers import UserSerializer, UserProfileSerializer
 from notifications.models import Notification
@@ -20,11 +23,10 @@ class RegisterView(APIView):
     def post(self, request):
         serializer = UserSerializer(data=request.data)
         if serializer.is_valid():
-            user = serializer.save()
-            token, _ = Token.objects.get_or_create(user=user)
+            user = serializer.save()   # Token.objects.create is called inside serializer
             return Response(
                 {
-                    'token': token.key,
+                    'token': serializer.data['token'],
                     'user_id': user.pk,
                     'username': user.username,
                 },
@@ -166,3 +168,11 @@ class UnfollowView(APIView):
             {'detail': f'You have unfollowed {target_user.username}.'},
             status=status.HTTP_200_OK,
         )
+
+
+class UserListView(generics.GenericAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+    queryset = CustomUser.objects.all()
+
+    def get(self, request):
+        return Response([])

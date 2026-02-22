@@ -142,11 +142,5 @@ class FeedView(generics.ListAPIView):
     pagination_class = PostPagination
 
     def get_queryset(self):
-        # Profile.followers is a M2M of User objects that follow *this* user.
-        # We want posts where the author is followed *by* the current user.
-        # The Profile.followers field stores: users that follow the profile owner.
-        # So "users I follow" = User objects whose profile lists me in .followers
-        following_users = User.objects.filter(
-            profile__followers=self.request.user
-        )
+        following_users = self.request.user.following.all().values_list('user', flat=True)
         return Post.objects.filter(author__in=following_users).order_by('-created_at')

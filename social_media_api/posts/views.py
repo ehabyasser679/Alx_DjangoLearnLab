@@ -1,4 +1,4 @@
-from rest_framework import viewsets, generics, status, filters
+from rest_framework import viewsets, generics, status, filters, permissions
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
@@ -61,6 +61,7 @@ class CommentViewSet(viewsets.ModelViewSet):
     PUT    /api/posts/<post_pk>/comments/<id>/   – update (author only)
     DELETE /api/posts/<post_pk>/comments/<id>/   – delete (author only)
     """
+    queryset = Comment.objects.all()
     serializer_class = CommentSerializer
     permission_classes = [IsAuthenticatedOrReadOnly, IsAuthorOrReadOnly]
 
@@ -92,11 +93,11 @@ class LikeView(APIView):
     POST   /api/posts/<pk>/like/    – like a post
     DELETE /api/posts/<pk>/like/    – unlike a post
     """
-    permission_classes = [IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request, pk):
-        post = get_object_or_404(Post, pk=pk)
-        like, created = Like.objects.get_or_create(post=post, user=request.user)
+        post = generics.get_object_or_404(Post, pk=pk)
+        like, created = Like.objects.get_or_create(user=request.user, post=post)
         if not created:
             return Response(
                 {'detail': 'You have already liked this post.'},
@@ -116,7 +117,7 @@ class LikeView(APIView):
         return Response({'detail': 'Post liked.'}, status=status.HTTP_201_CREATED)
 
     def delete(self, request, pk):
-        post = get_object_or_404(Post, pk=pk)
+        post = generics.get_object_or_404(Post, pk=pk)
         deleted, _ = Like.objects.filter(post=post, user=request.user).delete()
         if not deleted:
             return Response(

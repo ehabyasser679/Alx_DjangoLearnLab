@@ -13,7 +13,7 @@ PASSWORD_REGEX = re.compile(
 
 class UserSerializer(serializers.ModelSerializer):
     """Serializer used for user registration. Creates the user and their auth token."""
-    password = serializers.CharField(write_only=True, min_length=8)
+    password = serializers.CharField()
     token = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
@@ -44,7 +44,7 @@ class UserSerializer(serializers.ModelSerializer):
 
 class UserProfileSerializer(serializers.ModelSerializer):
     """Serializer for viewing and updating a user's profile."""
-    username = serializers.CharField(source='user.username', read_only=True)
+    username = serializers.CharField()
     email = serializers.EmailField(source='user.email', read_only=True)
     followers_count = serializers.SerializerMethodField()
 

@@ -1,7 +1,10 @@
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from rest_framework import serializers
+from rest_framework.authtoken.models import Token
 from .models import Profile
 import re
+
+User = get_user_model()
 
 PASSWORD_REGEX = re.compile(
     r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$'
@@ -9,12 +12,13 @@ PASSWORD_REGEX = re.compile(
 
 
 class UserSerializer(serializers.ModelSerializer):
-    """Serializer used for user registration."""
+    """Serializer used for user registration. Creates the user and their auth token."""
     password = serializers.CharField(write_only=True, min_length=8)
+    token = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'password']
+        fields = ['id', 'username', 'email', 'password', 'token']
 
     def validate_password(self, value):
         if not PASSWORD_REGEX.match(value):
@@ -25,12 +29,17 @@ class UserSerializer(serializers.ModelSerializer):
         return value
 
     def create(self, validated_data):
-        user = User.objects.create_user(
+        user = get_user_model().objects.create_user(
             username=validated_data['username'],
             email=validated_data.get('email', ''),
             password=validated_data['password'],
         )
+        Token.objects.create(user=user)
         return user
+
+    def get_token(self, obj):
+        token, _ = Token.objects.get_or_create(user=obj)
+        return token.key
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
